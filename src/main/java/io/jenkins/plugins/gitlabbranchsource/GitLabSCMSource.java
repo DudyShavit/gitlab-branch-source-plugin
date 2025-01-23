@@ -914,13 +914,21 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
                     return new StandardListBoxModel().includeEmptyValue();
                 }
                 try {
+                    Long groupId = gitLabApi.getGroupApi()
+                        .getGroup(projectOwner)
+                        .getId();
+
+                    List<Project> projects = gitLabApi.getGroupApi()
+                        .getProjects(groupId);
+
                     for (Project p : gitLabApi
-                            .getProjectApi()
-                            .getUserProjects(projectOwner, new ProjectFilter().withOwned(true))) {
+                        .getGroupApi()
+                        .getProjects(groupId)) {
                         result.add(p.getPathWithNamespace());
                     }
+
                 } catch (GitLabApiException e) {
-                    for (Project p : gitLabApi.getGroupApi().getProjects(projectOwner)) {
+                    for (Project p : gitLabApi.getProjectApi().getUserProjects(projectOwner, new ProjectFilter().withOwned(true))) {
                         result.add(p.getPathWithNamespace());
                     }
                 }
